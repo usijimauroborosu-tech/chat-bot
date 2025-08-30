@@ -1,8 +1,59 @@
-/index.html
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self';
-  X-Frame-Options: DENY
+# チャットボット用セキュリティヘッダー設定
+# すべてのページに適用
+/*
+  # Content Security Policy - チャットボットに最適化
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'self'; media-src 'self'; frame-src 'self'; connect-src 'self'; worker-src 'self' blob:; child-src 'self' blob:
+
+  # クリックジャッキング攻撃防止
+  X-Frame-Options: SAMEORIGIN
+
+  # MIME タイプスニッフィング攻撃防止
   X-Content-Type-Options: nosniff
+
+  # XSS フィルター有効化
+  X-XSS-Protection: 1; mode=block
+
+  # リファラーポリシー（適度な情報共有）
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: microphone=(), camera=(), geolocation=()
 
+  # 機能ポリシー（チャットボットに不要な機能を制限）
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), speaker=()
 
+  # HSTS (HTTPS強制) - 本番環境推奨
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+  # キャッシュ制御（チャットボットの応答性向上）
+  Cache-Control: public, max-age=3600
+
+# PDFファイル専用設定
+/*.pdf
+  # PDF用セキュリティ設定
+  Content-Security-Policy: default-src 'self'; script-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; object-src 'self'; frame-ancestors 'self'
+  
+  # PDFキャッシュ設定（長期キャッシュ）
+  Cache-Control: public, max-age=86400
+  
+  # PDF用コンテンツタイプ明示
+  Content-Type: application/pdf
+
+# APIエンドポイント用設定（もしAPIを使用する場合）
+/api/*
+  # API用セキュリティ設定
+  Content-Security-Policy: default-src 'none'; script-src 'none'; connect-src 'self'
+  
+  # CORS設定（必要に応じて調整）
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization
+  
+  # APIキャッシュ制御
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# 静的アセット用設定
+/*.js
+/*.css
+/*.woff
+/*.woff2
+/*.ttf
+  # 静的ファイル長期キャッシュ
+  Cache-Control: public, max-age=31536000
